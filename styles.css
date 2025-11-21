@@ -5,7 +5,7 @@
 }
 
 body {
-    font-family: 'Special Elite', cursive;
+    font-family: 'Special Elite', system-ui;
     background-color: #0a0a0a;
     color: #f0f0f0;
     line-height: 1.6;
@@ -74,7 +74,7 @@ section {
     justify-content: center;
     align-items: center;
     padding: 2rem;
-    text-align: center;
+    text-align: left;
 }
 
 .welcome {
@@ -109,7 +109,12 @@ h2 {
 p {
     font-size: 1.2rem;
     max-width: 800px;
-    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+h6 {
+    font-size: 0.8rem;
+    font-weight: normal;
 }
 
 /* Map styles */
@@ -192,7 +197,7 @@ button:hover {
     justify-content: center;
     align-items: center;
     background-color: #1a1a1a;
-    border: 1px solid #f0f0f0;
+    border: 1px solid #464646;
     font-family: 'Cutive Mono', monospace;
     font-size: 1rem;
 }
@@ -202,7 +207,7 @@ button:hover {
     display: none;
     max-width: 500px;
     max-height: 500px;
-    border: 2px solid #f0f0f0;
+    border: 2px solid #464646;
 }
 
 .image-display img {
@@ -231,6 +236,49 @@ button:hover {
     }
     60% {
         transform: translateY(-5px);
+    }
+}
+
+/* Map image styles */
+.map-image {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+}
+
+.map-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 1px solid #464646;
+}
+
+/* Game image display styles */
+.image-display {
+    margin-top: 2rem;
+    display: none;
+    max-width: 500px;
+    max-height: 500px;
+    border: 2px solid #f0f0f0;
+    background-color: #1a1a1a;
+}
+
+.image-display img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Responsive adjustments for images */
+@media (max-width: 768px) {
+    .map-image {
+        height: 300px;
+    }
+    
+    .image-display {
+        max-width: 100%;
+        max-height: 400px;
     }
 }
 
@@ -284,4 +332,86 @@ button:hover {
         flex-direction: column;
         gap: 1rem;
     }
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #000;
+}
+
+.close:hover {
+    color: #8b0000;
+}
+
+/* Password input styles */
+#password-input {
+    width: 100%;
+    margin: 1rem 0;
+    padding: 0.8rem;
+    background-color: #f5f5dc;
+    border: 1px solid #8b4513;
+    color: #000;
+    font-family: 'Special Elite', cursive;
+}
+
+#submit-password {
+    width: 100%;
+}
+
+/* Pulse animation for unlocked buttons */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Enhanced unlocked button styling */
+.game-btn.unlocked {
+    background-color: #2a2a2a;
+    border-color: #00ff00;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.game-btn.unlocked:hover {
+    background-color: #3a3a3a;
+    border-color: #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.game-btn.locked {
+    opacity: 0.7;
+    position: relative;
+    cursor: not-allowed;
+}
+
+.game-btn.locked:hover {
+    background-color: #1a1a1a;
 }
