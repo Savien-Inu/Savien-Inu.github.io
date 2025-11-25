@@ -117,6 +117,10 @@ h6 {
     font-weight: normal;
 }
 
+h3{
+    font-size: 2.0rem;
+    margin-top: 1.5rem;
+}
 /* Map styles */
 .map-container {
     margin: 2rem 0;
