@@ -59,8 +59,8 @@ document.querySelector('.login-form').addEventListener('submit', function(e) {
     const password = document.getElementById('password').value;
     const message = document.getElementById('login-message');
     
-    // Check credentials (in a real application, this would be server-side)
-    if (username === 'archive' && password === 'celebration2023') {
+    // too lazy to make a unique user for everyone LOL
+    if (username === 'celebrant' && password === '112804') {
         message.textContent = 'Authentication successful!';
         message.style.color = '#006400';
         
@@ -309,7 +309,7 @@ function resetAllPasswords() {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize game buttons
     initializeGameButtons();
-    
+    /*
     // Add reset button to games section
     const gamesSection = document.querySelector('.games-section .archive-paper');
     if (gamesSection && !gamesSection.querySelector('#reset-passwords-btn')) {
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resetButton.style.backgroundColor = '#8b0000';
         resetButton.addEventListener('click', resetAllPasswords);
         gamesSection.appendChild(resetButton);
-    }
+    } */
 });
 
 // Prevent any default button behavior
