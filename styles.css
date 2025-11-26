@@ -1,3 +1,4 @@
+/* I'm going to kill myself. idfk how to condense this css into less than 500 lines. */
 * {
     margin: 0;
     padding: 0;
@@ -420,4 +421,124 @@ button:hover {
 
 .game-btn.locked:hover {
     background-color: #1a1a1a;
+}
+
+/* Audio Permission Modal Styles */
+#audio-permission-modal .modal-content {
+    max-width: 500px;
+    text-align: center;
+}
+
+.permission-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.permission-btn {
+    padding: 1rem 2rem;
+    border: 1px solid #8b4513;
+    background-color: #f5f5dc;
+    color: #000;
+    font-family: 'Special Elite', cursive;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.permission-btn.allow {
+    background-color: #2a2a2a;
+    color: #f0f0f0;
+    border-color: #f0f0f0;
+}
+
+.permission-btn.allow:hover {
+    background-color: #006400;
+    border-color: #00ff00;
+}
+
+.permission-btn.deny:hover {
+    background-color: #8b0000;
+    color: #f0f0f0;
+}
+
+.permission-note {
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+    margin-top: 1rem;
+}
+
+/* Music Player Styles */
+.music-player {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.music-player.visible {
+    opacity: 1;
+}
+
+.mute-button {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #f0f0f0;
+    color: #f0f0f0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.mute-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+.mute-button.muted {
+    background: rgba(139, 0, 0, 0.7);
+}
+
+/* Loading state for typewriter */
+.typewriter-container.loading h1,
+.typewriter-container.loading p {
+    opacity: 0;
+}
+
+.typewriter-container.ready h1,
+.typewriter-container.ready p {
+    opacity: 1;
+}
+
+/* Confetti Canvas */
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* Enhanced music player for celebration */
+.music-player.celebrating .mute-button {
+    animation: celebrate 0.5s ease-in-out 3;
+}
+
+@keyframes celebrate {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }

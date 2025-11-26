@@ -8,12 +8,38 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="audio-permission-modal" class="modal">
+        <div class="modal-content archive-paper">
+            <h3>Allow Audio?</h3>
+            <p>Unfortunately, your browser requires me to ask for your consent before I can play music for you.</p>
+            <p>Would you like to hear music as you browse this invitation?</p>
+            <div class="permission-buttons">
+                <button id="allow-audio" class="permission-btn allow">Enable Audio</button>
+                <button id="deny-audio" class="permission-btn deny">Continue Without Audio</button>
+            </div>
+            <p class="permission-note">A mute button is available if you change your mind later.</p>
+        </div>
+    </div>    
     <!-- Welcome Section -->
     <section class="welcome">
         <div class="typewriter-container">
             <h1 id="main-title"></h1>
             <p id="subtitle"></p>
         </div>
+        <canvas id="confetti-canvas"></canvas>
+        <audio id="party-popper-sound">
+            <source src="music/party Horn.mp3" type="audio/mpeg">
+            <source src="music/Party Horn.ogg" type="audio/ogg">
+            Your browser isn't letting me play audio :C
+        </audio>
+        <div class="music-player">
+        <button id="mute-btn" class="mute-button">🔇</button>
+        <audio id="background-music" loop>
+            <source src="music/It's Showtime!.mp3" type="audio/mpeg">
+            <source src="music/It's Showtime!.ogg" type="audio/ogg">
+            Your browser isn't letting me play audio :C
+        </audio>
+    </div>
         <div class="scroll-indicator">▼</div>
     </section>
     
