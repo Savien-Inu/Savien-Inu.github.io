@@ -79,7 +79,7 @@ body {
 .shape {
   position: absolute;
   pointer-events: none;
-  will-change: transform, opacity;
+  will-change: transform;
 }
 
 /* Hollow Shapes (transparent with borders) */
@@ -264,7 +264,7 @@ body {
   border: 1px solid rgba(210, 180, 140, 0.35);
   box-shadow: 0 18px 35px -12px rgba(0, 0, 0, 0.6);
   padding: 1.6rem 1.7rem;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -358,6 +358,21 @@ body {
   font-size: 1.2rem;
   color: #b8860b;
   margin: 0 0.8rem;
+}
+
+.overview-subtitle {
+  text-align: center;
+  font-family: 'Courier New', 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  color: #8b6914;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed #d4a373;
+  display: block;
+  width: auto;
+  opacity: 0.8;
 }
 
 .paper-two-columns {
@@ -730,6 +745,54 @@ body {
   word-wrap: break-word;
 }
 
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 1rem 0;
+  display: block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.post-content a {
+  color: #b8860b;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.post-content a:hover {
+  color: #d4a373;
+}
+
+.post-content iframe {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+.post-content blockquote {
+  border-left: 4px solid #c7aa6e;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: #5a4a3a;
+}
+
+.post-content ul, .post-content ol {
+  margin: 0.5rem 0 0.5rem 1.5rem;
+}
+
+.post-content li {
+  margin: 0.25rem 0;
+}
+
+.post-content hr {
+  margin: 1rem 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d4c5a5, transparent);
+}
+
 /* ===== SOCIAL LINKS ===== */
 .full-width {
   grid-column: 1 / -1;
@@ -817,164 +880,17 @@ body {
   .blog-post-header { flex-direction: column; }
 }
 
-/* ===== BLOG POST IMAGES & MEDIA STYLES ===== */
-.post-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 12px;
-  margin: 1rem 0;
-  display: block;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+/* Mobile-specific: disable heavy animations */
+@media (max-width: 768px) {
+  .text-row span { animation: none !important; opacity: 0.6 !important; }
+  .shape { animation: none !important; transform: none !important; }
+  .bg-layer { opacity: 0.4; }
 }
 
-.post-content a {
-  color: #b8860b;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.post-content a:hover {
-  color: #d4a373;
-}
-
-.post-content iframe {
-  max-width: 100%;
-  border-radius: 12px;
-  margin: 1rem 0;
-}
-
-.post-content blockquote {
-  border-left: 4px solid #c7aa6e;
-  padding-left: 1rem;
-  margin: 1rem 0;
-  font-style: italic;
-  color: #5a4a3a;
-}
-
-.post-content ul, .post-content ol {
-  margin: 0.5rem 0 0.5rem 1.5rem;
-}
-
-.post-content li {
-  margin: 0.25rem 0;
-}
-
-.post-content hr {
-  margin: 1rem 0;
-  border: none;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #d4c5a5, transparent);
-}
-
-/* ===== OVERVIEW SUBTITLE (St. Pavlov Foundation) ===== */
-.overview-subtitle {
-  text-align: center;
-  font-family: 'Courier New', 'Space Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 1.5px;
-  color: #8b6914;
-  margin-top: -1rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px dashed #d4a373;
-  display: inline-block;
-  width: auto;
-  opacity: 0.8;
-  font-style: normal;
-}
-
-/* Center the subtitle under the overview header */
-.paper-document {
-  position: relative;
-}
-
-.paper-document .overview-header + .overview-subtitle {
-  display: block;
-  text-align: center;
-}
-
-/* ===== OVERVIEW SUBTITLE (St. Pavlov Foundation) ===== */
-.overview-subtitle {
-  text-align: center;
-  font-family: 'Courier New', 'Space Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 1.5px;
-  color: #8b6914;
-  margin-top: -1rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px dashed #d4a373;
-  display: inline-block;
-  width: auto;
-  opacity: 0.8;
-  font-style: italic;
-}
-
-.paper-document .overview-header + .overview-subtitle {
-  display: block;
-  text-align: center;
-}
-
-/* ===== BLOG POST IMAGES & MEDIA STYLES ===== */
-.post-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 12px;
-  margin: 1rem 0;
-  display: block;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.post-content a {
-  color: #b8860b;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.post-content a:hover {
-  color: #d4a373;
-}
-
-.post-content iframe {
-  max-width: 100%;
-  border-radius: 12px;
-  margin: 1rem 0;
-}
-
-.post-content blockquote {
-  border-left: 4px solid #c7aa6e;
-  padding-left: 1rem;
-  margin: 1rem 0;
-  font-style: italic;
-  color: #5a4a3a;
-}
-
-.post-content ul, .post-content ol {
-  margin: 0.5rem 0 0.5rem 1.5rem;
-}
-
-.post-content li {
-  margin: 0.25rem 0;
-}
-
-.post-content hr {
-  margin: 1rem 0;
-  border: none;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #d4c5a5, transparent);
-}
-
-/* Loading animation */
-.loading-posts {
-  text-align: center;
-  padding: 2rem;
-  opacity: 0.6;
-  font-style: italic;
-}
-
-.error-message {
-  text-align: center;
-  padding: 2rem;
-  color: #e0b8a8;
-  font-style: italic;
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .card, .social-btn, .blog-post, .shape, .text-row {
+    transition: none !important;
+    animation: none !important;
+  }
 }

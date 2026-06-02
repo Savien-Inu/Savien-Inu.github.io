@@ -1,7 +1,10 @@
 (function() {
+  // Detect mobile devices for performance optimization
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
+  
   // ===== PHRASE LIBRARY =====
   const PHRASES = [
-   "THE WORLD IS NOT BEAUTIFUL, THEREFORE, IT IS.",
+    "THE WORLD IS NOT BEAUTIFUL, THEREFORE, IT IS.",
     "SOCIETY? DON'T YOU MEAN YOURSELF?",
     "GOD, I ASK YOU, IS NON-RESISTANCE A CRIME?",
     "STRUGGLING OUT OF THE EGG, THE EGG IS THE WORLD.",
@@ -54,10 +57,7 @@
   function parseMarkdown(content) {
     if (!content) return '';
     
-    let html = content;
-    
-    // Escape HTML first to prevent injection
-    html = escapeHtml(html);
+    let html = escapeHtml(content);
     
     // Images: ![alt](url)
     html = html.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" loading="lazy">');
@@ -112,18 +112,8 @@
   }
 
   // ===== LOAD BLOG POSTS FROM INDIVIDUAL FILES =====
-  // This function scans the blog-posts folder and loads all .js files
   async function loadBlogPosts() {
-    const container = document.getElementById('blogPostsList');
-    
-    // Define the list of post files to load
-    // You need to manually list your post files here
-    // Each file should be in the format: post-1.js, post-2.js, etc.
-    const postFiles = [
-      'post-1.js'
-      // Add more post files here as you create them
-    ];
-    
+    const postFiles = ['post-1.js'];
     blogPosts = [];
     
     for (const file of postFiles) {
@@ -131,7 +121,6 @@
         const response = await fetch(`blog-posts/${file}`);
         if (response.ok) {
           const scriptText = await response.text();
-          // Execute the script to get the post data
           const scriptFunction = new Function(scriptText + '; return BLOG_POST;');
           const post = scriptFunction();
           if (post && post.id) {
@@ -143,22 +132,17 @@
       }
     }
     
-    // Sort posts by ID (newest first - assuming higher ID = newer)
     blogPosts.sort((a, b) => b.id - a.id);
-    
     postsLoaded = true;
     renderBlogPosts();
   }
   
-  // Alternative: Dynamically detect post files via a manifest
-  // You can also create a manifest.json file in the blog-posts folder
   async function loadPostsFromManifest() {
     try {
       const response = await fetch('blog-posts/manifest.json');
       if (response.ok) {
         const manifest = await response.json();
         const postFiles = manifest.posts;
-        
         blogPosts = [];
         
         for (const file of postFiles) {
@@ -181,7 +165,6 @@
         postsLoaded = true;
         renderBlogPosts();
       } else {
-        // Fallback to manual list
         await loadBlogPosts();
       }
     } catch (error) {
@@ -217,7 +200,8 @@
           <span class="blog-post-author">— ${escapeHtml(post.author)}</span>
         </div>
       </div>
-    `}).join('');
+    `;
+    }).join('');
   }
 
   window.viewPost = function(id) {
@@ -284,170 +268,186 @@
     }
   }
 
-  // ===== DYNAMIC STYLESHEET =====
-  let styleSheet = document.styleSheets[0];
-  if (!styleSheet) {
-    const style = document.createElement('style');
-    document.head.appendChild(style);
-    styleSheet = style.sheet;
-  }
-
-  // ===== FLOATING BACKGROUND TEXTS =====
-  const textRows = [1, 2, 3, 4, 5].map(i => document.getElementById(`textRow${i}`));
-  
-  const getRandomStyles = () => `${randomItem(FONT_CLASSES)} ${randomItem(SIZE_CLASSES)} ${randomItem(BLUR_CLASSES)} ${randomItem(COLOR_CLASSES)}`;
-  const getRandomVerticalPos = () => 5 + Math.random() * 85;
-  const getRandomDrift = () => ({ 
-    direction: Math.random() > 0.5 ? 1 : -1, 
-    duration: 60 + Math.random() * 90,
-    distance: 20 + Math.random() * 40
-  });
-
-  const updateTextRow = (row, id) => {
-    if (!row) return;
-    
-    const span = document.createElement('span');
-    span.className = getRandomStyles();
-    span.textContent = randomItem(PHRASES);
-    span.style.opacity = '0';
-    span.style.transition = 'opacity 0.3s ease';
-    
-    row.innerHTML = '';
-    row.appendChild(span);
-    row.style.top = `${getRandomVerticalPos()}%`;
-    
-    const { direction, duration, distance } = getRandomDrift();
-    const startX = direction === 1 ? -distance : distance;
-    const endX = direction === 1 ? distance : -distance;
-    const animName = `drift_${id}_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
-    
-    const keyframes = `@keyframes ${animName} { 
-      0% { transform: translateX(${startX}%); } 
-      100% { transform: translateX(${endX}%); } 
-    }`;
-    
-    try {
-      for (let i = styleSheet.cssRules.length - 1; i >= 0; i--) {
-        if (styleSheet.cssRules[i]?.name?.startsWith(`drift_${id}_`)) {
-          styleSheet.deleteRule(i);
-        }
-      }
-      styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
-    } catch(e) {
+  // ===== BACKGROUND ANIMATIONS - only run on desktop =====
+  if (!isMobile) {
+    let styleSheet = document.styleSheets[0];
+    if (!styleSheet) {
       const style = document.createElement('style');
-      style.textContent = keyframes;
       document.head.appendChild(style);
+      styleSheet = style.sheet;
     }
-    
-    const fadeDuration = 12 + Math.random() * 6;
-    row.style.animation = `${animName} ${duration}s linear infinite`;
-    span.style.animation = `fadeTextInOut ${fadeDuration}s ease-in-out infinite`;
-    
-    setTimeout(() => { if (span) span.style.opacity = '1'; }, 10);
-  };
 
-  textRows.forEach((row, idx) => {
-    setTimeout(() => updateTextRow(row, idx), idx * 500);
-    setInterval(() => updateTextRow(row, idx), 18000 + Math.random() * 10000);
-  });
+    const textRows = [1, 2, 3, 4, 5].map(i => document.getElementById(`textRow${i}`));
+    
+    const getRandomStyles = () => `${randomItem(FONT_CLASSES)} ${randomItem(SIZE_CLASSES)} ${randomItem(BLUR_CLASSES)} ${randomItem(COLOR_CLASSES)}`;
+    const getRandomVerticalPos = () => 5 + Math.random() * 85;
+    const getRandomDrift = () => ({ 
+      direction: Math.random() > 0.5 ? 1 : -1, 
+      duration: 60 + Math.random() * 90,
+      distance: 20 + Math.random() * 40
+    });
 
-  // ===== FLOATING BACKGROUND SHAPES =====
-  const shapesContainer = document.getElementById('shapesContainer');
-  
-  const createShape = () => {
-    const type = randomItem(SHAPE_TYPES);
-    const shape = document.createElement('div');
-    shape.className = `shape ${type}`;
-    
-    const isStar = type.includes('star');
-    const isTriangle = type.includes('triangle');
-    
-    if (isStar) {
-      const starSize = randomRange(20, 55);
-      shape.style.fontSize = `${starSize}px`;
-      shape.style.width = 'auto';
-      shape.style.height = 'auto';
-      shape.style.display = 'inline-flex';
-      shape.style.alignItems = 'center';
-      shape.style.justifyContent = 'center';
+    const updateTextRow = (row, idx) => {
+      if (!row) return;
       
-      if (type === 'shape-star-solid') {
-        const starSpan = document.createElement('span');
-        starSpan.textContent = '✦';
-        starSpan.style.fontSize = 'inherit';
-        starSpan.style.color = `rgba(227, 165, 67, ${randomRange(0.5, 0.8)})`;
-        starSpan.style.textShadow = `0 0 ${randomRange(4, 10)}px rgba(227, 165, 67, 0.4)`;
-        shape.appendChild(starSpan);
-        shape.style.background = 'transparent';
-        shape.style.border = 'none';
-      }
-    } else if (isTriangle) {
-      const triW = randomRange(15, 45);
-      const triH = randomRange(25, 70);
-      shape.style.setProperty('--tw', `${triW}px`);
-      shape.style.setProperty('--th', `${triH}px`);
-    } else {
-      const size = randomRange(20, 90);
-      shape.style.width = `${size}px`;
-      shape.style.height = `${size}px`;
-    }
-    
-    shape.style.left = `${randomRange(0, 92)}%`;
-    shape.style.top = `${randomRange(0, 88)}%`;
-    
-    const baseOpacity = type.includes('solid') ? randomRange(0.35, 0.65) : randomRange(0.25, 0.55);
-    shape.style.opacity = baseOpacity;
-    
-    const moveX = randomRange(-40, 40);
-    const moveY = randomRange(-35, 35);
-    const rot = randomRange(-15, 15);
-    const duration = randomRange(15, 40);
-    
-    const animName = `shapeFloat_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
-    const keyframes = `@keyframes ${animName} { 
-      0% { transform: translate(0,0) rotate(0deg); } 
-      50% { transform: translate(${moveX}px, ${moveY}px) rotate(${rot}deg); } 
-      100% { transform: translate(0,0) rotate(0deg); } 
-    }`;
-    
-    try {
-      if (styleSheet.cssRules.length > 200) {
-        for (let i = 0; i < 50; i++) {
-          if (styleSheet.cssRules[i]?.name?.startsWith('shapeFloat_')) {
+      const span = document.createElement('span');
+      span.className = getRandomStyles();
+      span.textContent = randomItem(PHRASES);
+      span.style.opacity = '0';
+      span.style.transition = 'opacity 0.3s ease';
+      
+      row.innerHTML = '';
+      row.appendChild(span);
+      row.style.top = `${getRandomVerticalPos()}%`;
+      
+      const { direction, duration, distance } = getRandomDrift();
+      const startX = direction === 1 ? -distance : distance;
+      const endX = direction === 1 ? distance : -distance;
+      const animName = `drift_${idx}_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
+      
+      const keyframes = `@keyframes ${animName} { 
+        0% { transform: translateX(${startX}%); } 
+        100% { transform: translateX(${endX}%); } 
+      }`;
+      
+      try {
+        for (let i = styleSheet.cssRules.length - 1; i >= 0; i--) {
+          if (styleSheet.cssRules[i]?.name?.startsWith(`drift_${idx}_`)) {
             styleSheet.deleteRule(i);
-            break;
           }
         }
+        styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+      } catch(e) {
+        const style = document.createElement('style');
+        style.textContent = keyframes;
+        document.head.appendChild(style);
       }
-      styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
-    } catch(e) {
-      const style = document.createElement('style');
-      style.textContent = keyframes;
-      document.head.appendChild(style);
-    }
-    
-    shape.style.animation = `${animName} ${duration}s ease-in-out infinite`;
-    shape.style.animationDelay = `${randomRange(0, 12)}s`;
-    
-    if (Math.random() > 0.7) {
-      const blurAmount = type.includes('solid') ? randomRange(0.5, 1.5) : randomRange(0.8, 2.5);
-      shape.style.filter = `blur(${blurAmount}px)`;
-    }
-    
-    shapesContainer.appendChild(shape);
-    
-    const lifespan = duration * 1000 + randomRange(15000, 35000);
-    setTimeout(() => { 
-      if (shape.parentNode) { 
-        shape.remove(); 
-        createShape(); 
-      } 
-    }, lifespan);
-  };
+      
+      const fadeDuration = 12 + Math.random() * 6;
+      row.style.animation = `${animName} ${duration}s linear infinite`;
+      span.style.animation = `fadeTextInOut ${fadeDuration}s ease-in-out infinite`;
+      
+      setTimeout(() => { if (span) span.style.opacity = '1'; }, 10);
+    };
 
-  const shapeCount = 8 + Math.floor(Math.random() * 5);
-  for (let i = 0; i < shapeCount; i++) {
-    setTimeout(() => createShape(), i * 600);
+    textRows.forEach((row, idx) => {
+      setTimeout(() => updateTextRow(row, idx), idx * 500);
+      setInterval(() => updateTextRow(row, idx), 20000);
+    });
+
+    // ===== FLOATING BACKGROUND SHAPES =====
+    const shapesContainer = document.getElementById('shapesContainer');
+    
+    const createShape = () => {
+      const type = randomItem(SHAPE_TYPES);
+      const shape = document.createElement('div');
+      shape.className = `shape ${type}`;
+      
+      const isStar = type.includes('star');
+      const isTriangle = type.includes('triangle');
+      
+      if (isStar) {
+        const starSize = randomRange(20, 55);
+        shape.style.fontSize = `${starSize}px`;
+        shape.style.width = 'auto';
+        shape.style.height = 'auto';
+        shape.style.display = 'inline-flex';
+        shape.style.alignItems = 'center';
+        shape.style.justifyContent = 'center';
+        
+        if (type === 'shape-star-solid') {
+          const starSpan = document.createElement('span');
+          starSpan.textContent = '✦';
+          starSpan.style.fontSize = 'inherit';
+          starSpan.style.color = `rgba(227, 165, 67, ${randomRange(0.5, 0.8)})`;
+          starSpan.style.textShadow = `0 0 ${randomRange(4, 10)}px rgba(227, 165, 67, 0.4)`;
+          shape.appendChild(starSpan);
+          shape.style.background = 'transparent';
+          shape.style.border = 'none';
+        }
+      } else if (isTriangle) {
+        const triW = randomRange(15, 45);
+        const triH = randomRange(25, 70);
+        shape.style.setProperty('--tw', `${triW}px`);
+        shape.style.setProperty('--th', `${triH}px`);
+      } else {
+        const size = randomRange(20, 90);
+        shape.style.width = `${size}px`;
+        shape.style.height = `${size}px`;
+      }
+      
+      shape.style.left = `${randomRange(0, 92)}%`;
+      shape.style.top = `${randomRange(0, 88)}%`;
+      
+      const baseOpacity = type.includes('solid') ? randomRange(0.35, 0.65) : randomRange(0.25, 0.55);
+      shape.style.opacity = baseOpacity;
+      
+      const moveX = randomRange(-40, 40);
+      const moveY = randomRange(-35, 35);
+      const rot = randomRange(-15, 15);
+      const duration = randomRange(15, 40);
+      
+      const animName = `shapeFloat_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
+      const keyframes = `@keyframes ${animName} { 
+        0% { transform: translate(0,0) rotate(0deg); } 
+        50% { transform: translate(${moveX}px, ${moveY}px) rotate(${rot}deg); } 
+        100% { transform: translate(0,0) rotate(0deg); } 
+      }`;
+      
+      try {
+        if (styleSheet.cssRules.length > 200) {
+          for (let i = 0; i < 50; i++) {
+            if (styleSheet.cssRules[i]?.name?.startsWith('shapeFloat_')) {
+              styleSheet.deleteRule(i);
+              break;
+            }
+          }
+        }
+        styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+      } catch(e) {
+        const style = document.createElement('style');
+        style.textContent = keyframes;
+        document.head.appendChild(style);
+      }
+      
+      shape.style.animation = `${animName} ${duration}s ease-in-out infinite`;
+      shape.style.animationDelay = `${randomRange(0, 12)}s`;
+      
+      if (Math.random() > 0.7) {
+        const blurAmount = type.includes('solid') ? randomRange(0.5, 1.5) : randomRange(0.8, 2.5);
+        shape.style.filter = `blur(${blurAmount}px)`;
+      }
+      
+      shapesContainer.appendChild(shape);
+      
+      const lifespan = duration * 1000 + randomRange(15000, 35000);
+      setTimeout(() => { 
+        if (shape.parentNode) { 
+          shape.remove(); 
+          createShape(); 
+        } 
+      }, lifespan);
+    };
+
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => createShape(), i * 600);
+    }
+  } else {
+    // On mobile: show static background text without animations for performance
+    const textRows = [1, 2, 3, 4, 5].map(i => document.getElementById(`textRow${i}`));
+    textRows.forEach((row, idx) => {
+      if (row) {
+        const span = document.createElement('span');
+        span.className = 'ft-serif size-md clear orange-pale';
+        span.textContent = PHRASES[idx % PHRASES.length];
+        row.innerHTML = '';
+        row.appendChild(span);
+        row.style.top = `${15 + idx * 15}%`;
+        span.style.opacity = '0.35';
+      }
+    });
+    const shapesContainer = document.getElementById('shapesContainer');
+    if (shapesContainer) shapesContainer.style.display = 'none';
   }
 
   // ===== INITIALIZATION =====
