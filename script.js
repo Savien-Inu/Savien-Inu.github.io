@@ -1,39 +1,10 @@
 (function() {
-  // ===== STATIC BLOG POSTS =====
-  // Use simple markdown-style formatting:
-  // [text](url) for links
-  // ![alt](image-url) for images
-  // **bold** for bold text
-  // *italic* for italic text
-  // > quote for blockquotes
-  // - item for bullet points
-  
-  const BLOG_POSTS = [
-    {
-      id: 1,
-      title: "Hello There.",
-      content: `If you are seeing this, it means the blog post system is working!
-
-**Thanks for stopping by!**
-> 
-Since I have nothing else to share, I will once again share this week's obssession:
-[Shun-ran by john / TOOBOE](https://youtu.be/pUH9vCsvq08)
-> 
-That's all for now, I hope to be able to make more blog posts soon!
-> 
-*Until we meet again~*`,
-      author: "Savi",
-      date: "June 1, 2026"
-    }
-  ];
-
   // ===== PHRASE LIBRARY =====
   const PHRASES = [
    "THE WORLD IS NOT BEAUTIFUL, THEREFORE, IT IS.",
     "SOCIETY? DON'T YOU MEAN YOURSELF?",
     "GOD, I ASK YOU, IS NON-RESISTANCE A CRIME?",
     "STRUGGLING OUT OF THE EGG, THE EGG IS THE WORLD.",
-    "✦ I AM WHO I AM. ✦",
     "O FETUS, O FETUS, WHY DO YOU SQUIRM?",
     "BUT A DREAM WITHIN A DREAM?",
     "MY COWARDLY PRIDE AND HAUGHTY SHAME.",
@@ -68,6 +39,9 @@ That's all for now, I hope to be able to make more blog posts soon!
 
   const randomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
   const randomRange = (min, max) => min + Math.random() * (max - min);
+  
+  let blogPosts = [];
+  let postsLoaded = false;
   
   function escapeHtml(text) {
     if (!text) return '';
@@ -111,7 +85,6 @@ That's all for now, I hope to be able to make more blog posts soon!
     const paragraphs = html.split(/\n\s*\n/);
     if (paragraphs.length > 1) {
       html = paragraphs.map(p => {
-        // Skip if already wrapped in block elements
         if (p.startsWith('<ul>') || p.startsWith('<blockquote>') || p.startsWith('<img')) {
           return p;
         }
@@ -126,17 +99,189 @@ That's all for now, I hope to be able to make more blog posts soon!
 
   function getPlainTextExcerpt(content, maxLength = 120) {
     if (!content) return '';
-    // Remove markdown syntax for clean excerpt
     let plain = content
       .replace(/!\[.*?\]\(.*?\)/g, '')
       .replace(/\[(.*?)\]\(.*?\)/g, '$1')
       .replace(/\*\*(.*?)\*\*/g, '$1')
-     .replace(/\*(.*?)\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
       .replace(/^&gt; /gm, '')
       .replace(/^- /gm, '')
       .replace(/\n/g, ' ');
     if (plain.length <= maxLength) return plain;
     return plain.substring(0, maxLength) + '...';
+  }
+
+  // ===== LOAD BLOG POSTS FROM INDIVIDUAL FILES =====
+  // This function scans the blog-posts folder and loads all .js files
+  async function loadBlogPosts() {
+    const container = document.getElementById('blogPostsList');
+    
+    // Define the list of post files to load
+    // You need to manually list your post files here
+    // Each file should be in the format: post-1.js, post-2.js, etc.
+    const postFiles = [
+      'post-1.js'
+      // Add more post files here as you create them
+    ];
+    
+    blogPosts = [];
+    
+    for (const file of postFiles) {
+      try {
+        const response = await fetch(`blog-posts/${file}`);
+        if (response.ok) {
+          const scriptText = await response.text();
+          // Execute the script to get the post data
+          const scriptFunction = new Function(scriptText + '; return BLOG_POST;');
+          const post = scriptFunction();
+          if (post && post.id) {
+            blogPosts.push(post);
+          }
+        }
+      } catch (error) {
+        console.warn(`Could not load ${file}:`, error);
+      }
+    }
+    
+    // Sort posts by ID (newest first - assuming higher ID = newer)
+    blogPosts.sort((a, b) => b.id - a.id);
+    
+    postsLoaded = true;
+    renderBlogPosts();
+  }
+  
+  // Alternative: Dynamically detect post files via a manifest
+  // You can also create a manifest.json file in the blog-posts folder
+  async function loadPostsFromManifest() {
+    try {
+      const response = await fetch('blog-posts/manifest.json');
+      if (response.ok) {
+        const manifest = await response.json();
+        const postFiles = manifest.posts;
+        
+        blogPosts = [];
+        
+        for (const file of postFiles) {
+          try {
+            const postResponse = await fetch(`blog-posts/${file}`);
+            if (postResponse.ok) {
+              const scriptText = await postResponse.text();
+              const scriptFunction = new Function(scriptText + '; return BLOG_POST;');
+              const post = scriptFunction();
+              if (post && post.id) {
+                blogPosts.push(post);
+              }
+            }
+          } catch (error) {
+            console.warn(`Could not load ${file}:`, error);
+          }
+        }
+        
+        blogPosts.sort((a, b) => b.id - a.id);
+        postsLoaded = true;
+        renderBlogPosts();
+      } else {
+        // Fallback to manual list
+        await loadBlogPosts();
+      }
+    } catch (error) {
+      console.warn('Could not load manifest, using manual list:', error);
+      await loadBlogPosts();
+    }
+  }
+
+  function renderBlogPosts() {
+    const container = document.getElementById('blogPostsList');
+    if (!container) return;
+    
+    if (!postsLoaded) {
+      container.innerHTML = '<div class="empty-blog-message">✧ loading posts... ✧</div>';
+      return;
+    }
+    
+    if (blogPosts.length === 0) {
+      container.innerHTML = '<div class="empty-blog-message">✧ no entries yet — check back later ✧</div>';
+      return;
+    }
+    
+    container.innerHTML = blogPosts.map(post => {
+      const plainExcerpt = getPlainTextExcerpt(post.content, 120);
+      return `
+      <div class="blog-post" onclick="viewPost(${post.id})">
+        <div class="blog-post-header">
+          <h4 class="blog-post-title">${escapeHtml(post.title)}</h4>
+          <span class="blog-post-date">${escapeHtml(post.date)}</span>
+        </div>
+        <p class="blog-post-excerpt">${escapeHtml(plainExcerpt)}</p>
+        <div class="blog-post-footer">
+          <span class="blog-post-author">— ${escapeHtml(post.author)}</span>
+        </div>
+      </div>
+    `}).join('');
+  }
+
+  window.viewPost = function(id) {
+    const post = blogPosts.find(p => p.id === id);
+    if (!post) return;
+    
+    const blogList = document.getElementById('blogPostsList');
+    if (blogList) {
+      sessionStorage.setItem('blogScrollPos', blogList.scrollTop);
+    }
+    
+    const htmlContent = parseMarkdown(post.content);
+    
+    const container = document.getElementById('mainContainer');
+    container.innerHTML = `
+      <div class="post-page">
+        <div class="back-button" onclick="goBackToMain()">← Back to main page</div>
+        <div class="paper-document">
+          <h1 class="post-title">${escapeHtml(post.title)}</h1>
+          <div class="post-meta">📅 ${escapeHtml(post.date)} | ✍️ ${escapeHtml(post.author)}</div>
+          <div class="post-content">${htmlContent}</div>
+        </div>
+      </div>
+    `;
+    
+    window.location.hash = `post-${id}`;
+    window.scrollTo(0, 0);
+  };
+
+  window.goBackToMain = function() {
+    window.location.href = window.location.pathname;
+  };
+
+  function checkHashAndLoad() {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#post-')) {
+      const id = parseInt(hash.replace('#post-', ''));
+      const post = blogPosts.find(p => p.id === id);
+      if (post) viewPost(id);
+    }
+  }
+
+  function setupBlogScroll() {
+    const blogList = document.getElementById('blogPostsList');
+    const scrollUpBtn = document.getElementById('scrollBlogUp');
+    const scrollDownBtn = document.getElementById('scrollBlogDown');
+    
+    if (scrollUpBtn) {
+      scrollUpBtn.addEventListener('click', () => {
+        if (blogList) blogList.scrollBy({ top: -200, behavior: 'smooth' });
+      });
+    }
+    
+    if (scrollDownBtn) {
+      scrollDownBtn.addEventListener('click', () => {
+        if (blogList) blogList.scrollBy({ top: 200, behavior: 'smooth' });
+      });
+    }
+    
+    const savedScroll = sessionStorage.getItem('blogScrollPos');
+    if (savedScroll && blogList) {
+      blogList.scrollTop = parseInt(savedScroll);
+      sessionStorage.removeItem('blogScrollPos');
+    }
   }
 
   // ===== DYNAMIC STYLESHEET =====
@@ -305,102 +450,14 @@ That's all for now, I hope to be able to make more blog posts soon!
     setTimeout(() => createShape(), i * 600);
   }
 
-  // ===== BLOG FUNCTIONALITY =====
-  let blogPosts = [...BLOG_POSTS];
-
-  function renderBlogPosts() {
-    const container = document.getElementById('blogPostsList');
-    if (!container) return;
-    
-    if (blogPosts.length === 0) {
-      container.innerHTML = '<div class="empty-blog-message">✧ no entries yet — check back later ✧</div>';
-      return;
-    }
-    
-    container.innerHTML = blogPosts.map(post => {
-      const plainExcerpt = getPlainTextExcerpt(post.content, 120);
-      return `
-      <div class="blog-post" onclick="viewPost(${post.id})">
-        <div class="blog-post-header">
-          <h4 class="blog-post-title">${escapeHtml(post.title)}</h4>
-          <span class="blog-post-date">${escapeHtml(post.date)}</span>
-        </div>
-        <p class="blog-post-excerpt">${escapeHtml(plainExcerpt)}</p>
-        <div class="blog-post-footer">
-          <span class="blog-post-author">— ${escapeHtml(post.author)}</span>
-        </div>
-      </div>
-    `}).join('');
-  }
-
-  window.viewPost = function(id) {
-    const post = blogPosts.find(p => p.id === id);
-    if (!post) return;
-    
-    const blogList = document.getElementById('blogPostsList');
-    if (blogList) {
-      sessionStorage.setItem('blogScrollPos', blogList.scrollTop);
-    }
-    
-    const htmlContent = parseMarkdown(post.content);
-    
-    const container = document.getElementById('mainContainer');
-    container.innerHTML = `
-      <div class="post-page">
-        <div class="back-button" onclick="goBackToMain()">← Back to main page</div>
-        <div class="paper-document">
-          <h1 class="post-title">${escapeHtml(post.title)}</h1>
-          <div class="post-meta">📅 ${escapeHtml(post.date)} | ✍️ ${escapeHtml(post.author)}</div>
-          <div class="post-content">${htmlContent}</div>
-        </div>
-      </div>
-    `;
-    
-    window.location.hash = `post-${id}`;
-    window.scrollTo(0, 0);
-  };
-
-  window.goBackToMain = function() {
-    window.location.href = window.location.pathname;
-  };
-
-  function checkHashAndLoad() {
-    const hash = window.location.hash;
-    if (hash && hash.startsWith('#post-')) {
-      const id = parseInt(hash.replace('#post-', ''));
-      const post = blogPosts.find(p => p.id === id);
-      if (post) viewPost(id);
-    }
-  }
-
-  function setupBlogScroll() {
-    const blogList = document.getElementById('blogPostsList');
-    const scrollUpBtn = document.getElementById('scrollBlogUp');
-    const scrollDownBtn = document.getElementById('scrollBlogDown');
-    
-    if (scrollUpBtn) {
-      scrollUpBtn.addEventListener('click', () => {
-        if (blogList) blogList.scrollBy({ top: -200, behavior: 'smooth' });
-      });
-    }
-    
-    if (scrollDownBtn) {
-      scrollDownBtn.addEventListener('click', () => {
-        if (blogList) blogList.scrollBy({ top: 200, behavior: 'smooth' });
-      });
-    }
-    
-    const savedScroll = sessionStorage.getItem('blogScrollPos');
-    if (savedScroll && blogList) {
-      blogList.scrollTop = parseInt(savedScroll);
-      sessionStorage.removeItem('blogScrollPos');
-    }
-  }
-
   // ===== INITIALIZATION =====
   document.addEventListener('DOMContentLoaded', () => {
-    renderBlogPosts();
+    loadPostsFromManifest();
     setupBlogScroll();
-    checkHashAndLoad();
+    
+    // Small delay to ensure posts are loaded before checking hash
+    setTimeout(() => {
+      checkHashAndLoad();
+    }, 500);
   });
 })();
