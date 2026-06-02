@@ -1,5 +1,5 @@
 const BLOG_POST = {
-      id: 1,
+      id: 2,
       title: "Another post!",
       content: `I've modified the blog post system again!
 
