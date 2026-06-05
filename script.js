@@ -81,7 +81,7 @@
     html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
     
     // Fix multiple blockquotes
-    html = html.replace(/<\/blockquote>\n<blockquote>/g, '<br>');
+    html = html.replace(/<\/blockquote>\n<blockquote>/g, '');
     
     // Convert double newlines to paragraphs
     const paragraphs = html.split(/\n\s*\n/);
@@ -180,12 +180,12 @@
     if (!container) return;
     
     if (!postsLoaded) {
-      container.innerHTML = '<div class="empty-blog-message">✧ loading posts... ✧</div>';
+      container.innerHTML = '<div class="empty-blog-message">✧ fetching posts... please wait warmly~ ✧</div>';
       return;
     }
     
     if (blogPosts.length === 0) {
-      container.innerHTML = '<div class="empty-blog-message">✧ no entries yet — check back later ✧</div>';
+      container.innerHTML = '<div class="empty-blog-message">✧error: no posts found! try reloading your browser or report to savi that this is broken!!✧</div>';
       return;
     }
     
