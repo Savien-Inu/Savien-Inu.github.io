@@ -236,7 +236,7 @@
       styleSheet = style.sheet;
     }
 
-    const textRows = [1, 2, 3, 4, 5].map(i => document.getElementById(`textRow${i}`));
+    const textRows = [1, 2, 3].map(i => document.getElementById(`textRow${i}`));
     
     const getRandomStyles = () => `${randomItem(FONT_CLASSES)} ${randomItem(SIZE_CLASSES)} ${randomItem(BLUR_CLASSES)} ${randomItem(COLOR_CLASSES)}`;
     const getRandomVerticalPos = () => 5 + Math.random() * 85;
@@ -388,7 +388,7 @@
       }, lifespan);
     };
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 5; i++) {
       setTimeout(() => createShape(), i * 600);
     }
   } else {

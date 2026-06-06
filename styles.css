@@ -34,7 +34,6 @@ body {
   width: 100%;
   text-align: center;
   white-space: nowrap;
-  will-change: transform, opacity;
 }
 
 .text-row span {
@@ -77,7 +76,6 @@ body {
 .shape {
   position: absolute;
   pointer-events: none;
-  will-change: transform;
 }
 
 /* Hollow Shapes (transparent with borders) */
