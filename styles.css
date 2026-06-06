@@ -926,3 +926,24 @@ body {
 .blog-content blockquote:last-child {
   margin-bottom: 0;
 }
+/* Disable smooth scrolling and complex rendering */
+* {
+  scroll-behavior: auto !important;
+}
+
+.blog-posts-list {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.blog-post {
+  transition: none !important;
+}
+
+.blog-post:hover {
+  transform: none !important;
+}
+
+.card, .paper-document, .blog-post {
+  box-shadow: none !important;
+}
