@@ -17,16 +17,14 @@
     "ONLY YOURSELF, YOU OWN FATE.",
     "WELCOME CHANGE, DON'T FEAR IT.",
     "THIS MOMENT IS ALL THAT MATTERS.",
-    "✦ THE PLAY IS THE TRAGEDY. ✦",
     "IT IS WHAT IT IS. IT IS WHERE IT IS.",
     "✦",
     "*",
-    "000",
     "YOU HAVE TO MAKE YOUR OWN WAY.",
-    "OH DEAR! I SHALL BE LATE!",
+    "WAITING FOR SOMETHING TO HAPPEN?",
     "HOPE CANNOT BE ELUDED FOREVER.",
     "✦ ENTER YE IN STRAIT IS THE GATE. ✦",
-    "CAN'T I JUST BE MYSELF?"
+    "THAT'S THAT, AND THIS IS THIS."
   ];
 
   // Style pools
@@ -55,60 +53,18 @@
     return div.innerHTML;
   }
 
-  // Simple markdown parser for blog content
-  function parseMarkdown(content) {
+  function parseHtmlContent(content) {
     if (!content) return '';
-    
-    let html = escapeHtml(content);
-    
-    // Images: ![alt](url)
-    html = html.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" loading="lazy">');
-    
-    // Links: [text](url)
-    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-    
-    // Bold: **text**
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    
-    // Italic: *text*
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    
-    // Blockquotes: > text
-    html = html.replace(/^&gt; (.*?)$/gm, '<blockquote>$1</blockquote>');
-    
-    // Bullet points: - item
-    html = html.replace(/^- (.*?)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
-    
-    // Fix multiple blockquotes
-    html = html.replace(/<\/blockquote>\n<blockquote>/g, '');
-    
-    // Convert double newlines to paragraphs
-    const paragraphs = html.split(/\n\s*\n/);
-    if (paragraphs.length > 1) {
-      html = paragraphs.map(p => {
-        if (p.startsWith('<ul>') || p.startsWith('<blockquote>') || p.startsWith('<img')) {
-          return p;
-        }
-        return `<p>${p.replace(/\n/g, '<br>')}</p>`;
-      }).join('');
-    } else {
-      html = html.replace(/\n/g, '<br>');
-    }
-    
-    return html;
+    return content;
   }
 
-  function getPlainTextExcerpt(content, maxLength = 120) {
+  function getPlainTextExcerpt(content, maxLength = 100) {
     if (!content) return '';
-    let plain = content
-      .replace(/!\[.*?\]\(.*?\)/g, '')
-      .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-      .replace(/\*\*(.*?)\*\*/g, '$1')
-      .replace(/\*(.*?)\*/g, '$1')
-      .replace(/^&gt; /gm, '')
-      .replace(/^- /gm, '')
-      .replace(/\n/g, ' ');
+    // Create a temporary element to strip HTML tags
+    const temp = document.createElement('div');
+    temp.innerHTML = content;
+    let plain = temp.textContent || temp.innerText || '';
+    plain = plain.replace(/\s+/g, ' ').trim();
     if (plain.length <= maxLength) return plain;
     return plain.substring(0, maxLength) + '...';
   }
@@ -170,7 +126,7 @@
         await loadBlogPosts();
       }
     } catch (error) {
-      console.warn('Could not load manifest, using manual list:', error);
+      console.warn('Could not load manifest!? The Manual list is not updated! Report this to Savi!', error);
       await loadBlogPosts();
     }
   }
@@ -215,17 +171,18 @@
       sessionStorage.setItem('blogScrollPos', blogList.scrollTop);
     }
     
-    const htmlContent = parseMarkdown(post.content);
+    // Use the new HTML parser instead of markdown parser
+    const htmlContent = parseHtmlContent(post.content);
     
     const container = document.getElementById('mainContainer');
     container.innerHTML = `
       <div class="post-page">
-        <div class="back-button" onclick="goBackToMain()">← Back to main page</div>
         <div class="paper-document">
           <h1 class="post-title">${escapeHtml(post.title)}</h1>
-          <div class="post-meta">📅 ${escapeHtml(post.date)} | ✍️ ${escapeHtml(post.author)}</div>
+          <div class="post-meta">📅 ${escapeHtml(post.date)} | Written by: ${escapeHtml(post.author)}</div>
           <div class="post-content">${htmlContent}</div>
         </div>
+      <div class="back-button" onclick="goBackToMain()">← Back to main page</div>
       </div>
     `;
     

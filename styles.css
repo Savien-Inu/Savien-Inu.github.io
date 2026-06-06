@@ -726,7 +726,7 @@ body {
   text-decoration: none;
   font-size: 0.9rem;
   transition: all 0.2s;
-  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
   cursor: pointer;
 }
 
@@ -907,4 +907,27 @@ body {
     transition: none !important;
     animation: none !important;
   }
+}
+
+.blog-paragraph {
+  margin-bottom: 1.5em;
+}
+
+
+.blog-content p {
+  margin-bottom: 1.5rem;
+}
+
+
+.blog-content p,
+.blog-content ul,
+.blog-content blockquote {
+  margin-bottom: 1.5rem;
+}
+
+
+.blog-content p:last-child,
+.blog-content ul:last-child,
+.blog-content blockquote:last-child {
+  margin-bottom: 0;
 }
