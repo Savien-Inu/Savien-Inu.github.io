@@ -35,8 +35,6 @@ body {
   text-align: center;
   white-space: nowrap;
   will-change: transform, opacity;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
 }
 
 .text-row span {
@@ -259,7 +257,6 @@ body {
 /* ===== CARDS ===== */
 .card {
   background: rgba(18, 20, 35, 0.78);
-  backdrop-filter: blur(12px);
   border-radius: 2rem;
   border: 1px solid rgba(210, 180, 140, 0.35);
   box-shadow: 0 18px 35px -12px rgba(0, 0, 0, 0.6);
