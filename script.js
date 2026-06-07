@@ -179,7 +179,7 @@
       <div class="post-page">
         <div class="paper-document">
           <h1 class="post-title">${escapeHtml(post.title)}</h1>
-          <div class="post-meta">📅 ${escapeHtml(post.date)} | Written by: ${escapeHtml(post.author)}</div>
+          <div class="post-meta"> ${escapeHtml(post.date)} | Written by: ${escapeHtml(post.author)}</div>
           <div class="post-content">${htmlContent}</div>
         </div>
       <div class="back-button" onclick="goBackToMain()">← Back to main page</div>
