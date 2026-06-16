@@ -802,6 +802,30 @@ body {
   background: linear-gradient(90deg, transparent, #d4c5a5, transparent);
 }
 
+.view-all-posts {
+  text-align: center;
+  padding: 15px 0 5px 0;
+}
+
+.view-all-link {
+  color: #e3a543;
+  text-decoration: none;
+  font-size: 0.95em;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid rgba(227, 165, 67, 0.3);
+  border-radius: 4px;
+}
+
+.view-all-link:hover {
+  background: rgba(227, 165, 67, 0.1);
+  border-color: #e3a543;
+  transform: scale(1.02);
+}
+
 /* ===== SOCIAL LINKS ===== */
 .full-width {
   grid-column: 1 / -1;
@@ -947,3 +971,4 @@ body {
 .card, .paper-document, .blog-post {
   box-shadow: none !important;
 }
+

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Savi's Ramblings</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .all-posts-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .all-posts-container h1 {
+      font-family: 'Playfair Display', serif;
+      text-align: center;
+      margin-bottom: 30px;
+      color: #e3a543;
+    }
+    .all-post-item {
+      background: rgba(30, 20, 10, 0.6);
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(227, 165, 67, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .all-post-item:hover {
+      background: rgba(227, 165, 67, 0.1);
+      border-color: #e3a543;
+    }
+    .all-post-item h3 {
+      margin: 0 0 5px 0;
+      color: #e3a543;
+    }
+    .all-post-item .date {
+      font-size: 0.85em;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      color: #e3a543;
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="all-posts-container" id="allPostsContainer">
+    <h1>✧ Blog Posts ✧</h1>
+    <div id="allPostsList"></div>
+    <a href="index.html" class="back-link">← Back to main page</a>
+  </div>
+
+  <script>
+    (function() {
+      const container = document.getElementById('allPostsList');
+      
+      async function loadAllPosts() {
+        try {
+          const response = await fetch('blog-posts/manifest.json');
+          if (!response.ok) throw new Error('Failed to load manifest!? Either file is not updated or Savi broke something. Please notify them!');
+          const manifest = await response.json();
+          const posts = [];
+          
+          for (const file of manifest.posts) {
+            try {
+              const postRes = await fetch(`blog-posts/${file}`);
+              if (postRes.ok) {
+                const scriptText = await postRes.text();
+                const scriptFunction = new Function(scriptText + '; return BLOG_POST;');
+                const post = scriptFunction();
+                if (post && post.id) posts.push(post);
+              }
+            } catch(e) {
+              console.warn(`Could not load ${file}:`, e);
+            }
+          }
+          
+          posts.sort((a, b) => b.id - a.id);
+          
+          if (posts.length === 0) {
+            container.innerHTML = '<p>If you see this, please refresh your browser!</p>';
+            return;
+          }
+          
+          container.innerHTML = posts.map(post => `
+            <div class="all-post-item" onclick="viewPost(${post.id})">
+              <h3>${escapeHtml(post.title)}</h3>
+              <div class="date">${escapeHtml(post.date)} — ${escapeHtml(post.author)}</div>
+              <p style="color: rgba(255,255,255,0.7); font-size: 0.9em; margin-top: 8px;">
+                ${getPlainTextExcerpt(post.content, 80)}
+              </p>
+            </div>
+          `).join('');
+        } catch(error) {
+          container.innerHTML = '<p>An error occured while loading the blog posts. Please refresh this page! If problem persists, please contact Savi!</p>';
+          console.error(error);
+        }
+      }
+      
+      function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+      
+      function getPlainTextExcerpt(content, maxLength = 100) {
+        if (!content) return '';
+        const temp = document.createElement('div');
+        temp.innerHTML = content;
+        let plain = temp.textContent || temp.innerText || '';
+        plain = plain.replace(/\s+/g, ' ').trim();
+        if (plain.length <= maxLength) return plain;
+        return plain.substring(0, maxLength) + '...';
+      }
+      
+      window.viewPost = function(id) {
+        window.location.href = `index.html#post-${id}`;
+      };
+      
+      loadAllPosts();
+    })();
+  </script>
+</body>
+</html>

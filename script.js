@@ -60,7 +60,6 @@
 
   function getPlainTextExcerpt(content, maxLength = 100) {
     if (!content) return '';
-    // Create a temporary element to strip HTML tags
     const temp = document.createElement('div');
     temp.innerHTML = content;
     let plain = temp.textContent || temp.innerText || '';
@@ -145,21 +144,29 @@
       return;
     }
     
-    container.innerHTML = blogPosts.map(post => {
-      const plainExcerpt = getPlainTextExcerpt(post.content, 120);
-      return `
-      <div class="blog-post" onclick="viewPost(${post.id})">
+    // Only show the MOST RECENT post (first one after sorting)
+    const latestPost = blogPosts[0];
+    const remainingCount = blogPosts.length - 1;
+    
+    const plainExcerpt = getPlainTextExcerpt(latestPost.content, 120);
+    
+    container.innerHTML = `
+      <div class="blog-post" onclick="viewPost(${latestPost.id})">
         <div class="blog-post-header">
-          <h4 class="blog-post-title">${escapeHtml(post.title)}</h4>
-          <span class="blog-post-date">${escapeHtml(post.date)}</span>
+          <h4 class="blog-post-title">${escapeHtml(latestPost.title)}</h4>
+          <span class="blog-post-date">${escapeHtml(latestPost.date)}</span>
         </div>
         <p class="blog-post-excerpt">${escapeHtml(plainExcerpt)}</p>
         <div class="blog-post-footer">
-          <span class="blog-post-author">— ${escapeHtml(post.author)}</span>
+          <span class="blog-post-author">— ${escapeHtml(latestPost.author)}</span>
         </div>
       </div>
+      ${remainingCount > 0 ? `
+        <div class="view-all-posts">
+          <a href="all-posts.html" class="view-all-link">✧ View all ${remainingCount + 1} blog posts ✧</a>
+        </div>
+      ` : ''}
     `;
-    }).join('');
   }
 
   window.viewPost = function(id) {
@@ -171,7 +178,6 @@
       sessionStorage.setItem('blogScrollPos', blogList.scrollTop);
     }
     
-    // Use the new HTML parser instead of markdown parser
     const htmlContent = parseHtmlContent(post.content);
     
     const container = document.getElementById('mainContainer');
@@ -414,7 +420,6 @@
     loadPostsFromManifest();
     setupBlogScroll();
     
-    // Small delay to ensure posts are loaded before checking hash
     setTimeout(() => {
       checkHashAndLoad();
     }, 500);
