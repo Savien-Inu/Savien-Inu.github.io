@@ -4,7 +4,7 @@ const BLOG_POST = {
       content: `
 <img src="https://64.media.tumblr.com/b1c0a09eeb3ea871a1ed280b9a608da8/tumblr_inline_p2x0jfvUTz1sv288m_500.gif" alt="Have you ever felt jealous of birds?" class="about-image" loading="lazy">
 <blockquote> Have you ever felt jealous of birds? </blockquote>
-<p>Birds are often used to represent freedom. Being able to fly wherever, whenever.</p>
+<p>Being able to fly wherever, whenever.</p>
 <p>To be able to explore the world like that, doesn't it sound amazing? It's no wonder why flight has been one of man's first dreams since the beginning of time.</p>
 <p>Kino's Journey often includes birds in their stories. The first Kino stating the famous quote:</p>
 <blockquote> Whenever people see birds flying through the sky, it's said that they get the urge to go on a journey. </blockquote>
