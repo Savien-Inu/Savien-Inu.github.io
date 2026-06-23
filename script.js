@@ -45,6 +45,7 @@
   
   let blogPosts = [];
   let postsLoaded = false;
+  let isViewingAllPosts = false;
   
   function escapeHtml(text) {
     if (!text) return '';
@@ -144,6 +145,30 @@
       return;
     }
     
+    // If we're viewing all posts, show all of them
+    if (isViewingAllPosts) {
+      container.innerHTML = blogPosts.map(post => {
+        const plainExcerpt = getPlainTextExcerpt(post.content, 120);
+        return `
+          <div class="blog-post" onclick="viewPost(${post.id})">
+            <div class="blog-post-header">
+              <h4 class="blog-post-title">${escapeHtml(post.title)}</h4>
+              <span class="blog-post-date">${escapeHtml(post.date)}</span>
+            </div>
+            <p class="blog-post-excerpt">${escapeHtml(plainExcerpt)}</p>
+            <div class="blog-post-footer">
+              <span class="blog-post-author">— ${escapeHtml(post.author)}</span>
+            </div>
+          </div>
+        `;
+      }).join('') + `
+        <div class="view-all-posts">
+          <a href="#" class="view-all-link" onclick="showLatestPost(event)">✧ Collapse list ✧</a>
+        </div>
+      `;
+      return;
+    }
+    
     // Only show the MOST RECENT post (first one after sorting)
     const latestPost = blogPosts[0];
     const remainingCount = blogPosts.length - 1;
@@ -163,11 +188,25 @@
       </div>
       ${remainingCount > 0 ? `
         <div class="view-all-posts">
-          <a href="all-posts.html" class="view-all-link">✧ View all ${remainingCount + 1} blog posts ✧</a>
+          <a href="#" class="view-all-link" onclick="showAllPosts(event)">✧ View all ${remainingCount + 1} posts ✧</a>
         </div>
       ` : ''}
     `;
   }
+
+  window.showAllPosts = function(event) {
+    if (event) event.preventDefault();
+    isViewingAllPosts = true;
+    renderBlogPosts();
+    window.location.hash = 'all-posts';
+  };
+
+  window.showLatestPost = function(event) {
+    if (event) event.preventDefault();
+    isViewingAllPosts = false;
+    renderBlogPosts();
+    window.location.hash = '';
+  };
 
   window.viewPost = function(id) {
     const post = blogPosts.find(p => p.id === id);
@@ -197,6 +236,8 @@
   };
 
   window.goBackToMain = function() {
+    // Reset the view state when going back
+    isViewingAllPosts = false;
     window.location.href = window.location.pathname;
   };
 
@@ -206,6 +247,9 @@
       const id = parseInt(hash.replace('#post-', ''));
       const post = blogPosts.find(p => p.id === id);
       if (post) viewPost(id);
+    } else if (hash === '#all-posts') {
+      isViewingAllPosts = true;
+      renderBlogPosts();
     }
   }
 
